@@ -61,3 +61,44 @@ export const signUp = asynHandler(async (req, res)=>{
     .json(new ApiResponse(201, createdUser, "User Created succesfully" ))
     
 })
+
+export const login = asynHandler(async (req, res)=>{
+    const {email, password} = req.body;
+
+    if(!email || !password){
+        throw new ApiError(400, "All fields are required");
+    }
+
+    const user = await User.findOne({email});
+
+    if(!user){
+        throw new ApiError(400, "Invalid email or password");
+    }
+
+
+    const isPasswordCorrect = await user.isPasswordMatched(password);
+
+    if(!isPasswordCorrect){
+        throw new ApiError(400, "Invalid email or password");
+    }
+
+    const accessToken = await generateAccessToken(user._id);
+
+    res.cookie("accessToken", accessToken, options);
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user, "User logged in succesfully" ))
+})
+
+export const logout = asynHandler(async (req, res)=>{
+    try {
+        res.clearCookie("accessToken", options);
+        
+        return res
+        .status(200)
+        .json({message: "User logged out succesfully"})
+    } catch (error) {
+        throw new ApiError(400, "Unable to logout");
+    }
+})
