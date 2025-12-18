@@ -6,7 +6,10 @@ import ApiResponse from "../utils/ApiResponce.js";
 
 const options = {
         httpOnly: true,
-        secure: true
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        secure: true,
+        sameSite: "strict",
+        secure: process.env.NODE_ENV === "development",
 }
 
 const generateAccessToken = async (id) =>{
