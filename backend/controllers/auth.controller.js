@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 import { asynHandler } from "../utils/asyncHandler.js";
 import ApiResponse from "../utils/ApiResponce.js";
+import { deleteToCloudinary, uploadToCloudinary } from "../utils/cloudinary.js";
 
 
 const options = {
@@ -101,4 +102,46 @@ export const logout = asynHandler(async (req, res)=>{
     } catch (error) {
         throw new ApiError(400, "Unable to logout");
     }
+})
+
+export const profileUpdate = asynHandler(async (req, res)=>{
+    const {fullName, email} = req.body;
+
+    if(!fullName || !email){
+        throw new ApiError(400, "All fields are required");
+    }
+
+    const profileImagePath = req.file.path;
+    // console.log(profileImagePath);
+
+    if(!profileImagePath){
+        throw new ApiError(400, "Profile image Path is required");
+    }
+
+    const profileImage = await uploadToCloudinary(profileImagePath);
+
+    // console.log(profileImage);
+
+    const user = await User.findOne({email});
+
+    if(!user){
+        throw new ApiError(400, "User not found");
+    }
+
+    if(user.profilePic){
+       await deleteToCloudinary(user.profilePicId);
+    }
+
+    // console.log("profileimagedeleted")
+
+    
+    user.profilePic = profileImage.secure_url;
+    user.profilePicId = profileImage.public_id;
+    await user.save();
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Profile updated succesfully" ))
+
+    
 })
