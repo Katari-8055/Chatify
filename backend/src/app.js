@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser"
 import cors from "cors"
 import router from "../routes/auth.route.js"
 import errorHandler from "../middleware/error.middleware.js"
+import messageRoute from "../routes/message.route.js"
 
 
 dotenv.config()
@@ -22,6 +23,7 @@ app.use(cookieParser());
 
 
 app.use("/api/v1/user", router);
+app.use("/api/v1/message", messageRoute);
 app.use(errorHandler);
 
 export default app
