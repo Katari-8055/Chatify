@@ -21,6 +21,11 @@ app.use(express.urlencoded({ extended: true, limit: '16kb' }));
 app.use(express.static("public")); 
 app.use(cookieParser()); 
 
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+}))
+
 
 app.use("/api/v1/user", router);
 app.use("/api/v1/message", messageRoute);

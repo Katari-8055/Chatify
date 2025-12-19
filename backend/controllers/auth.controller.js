@@ -17,7 +17,7 @@ const generateAccessToken = async (id) =>{
     try {
         const user = await User.findById(id);
         const accessToken = user.generateToken();
-        return {accessToken};
+        return accessToken;
     } catch (error) {
         throw new ApiError(400, "Unable To Generate Token")
     }
@@ -53,7 +53,7 @@ export const signUp = asynHandler(async (req, res)=>{
         throw new ApiError(400, "User not created");
     }
 
-    const {accessToken} = await generateAccessToken(createdUser._id);
+    const accessToken = await generateAccessToken(createdUser._id);
 
     res.cookie("accessToken", accessToken, options);
 
