@@ -103,45 +103,30 @@ export const logout = asynHandler(async (req, res)=>{
         throw new ApiError(400, "Unable to logout");
     }
 })
+export const profileUpdate = asyncHandler(async (req, res) => {
+    const LoggedUser = req.user;
 
-export const profileUpdate = asynHandler(async (req, res)=>{
-    const {fullName, email} = req.body;
-
-    if(!fullName || !email){
-        throw new ApiError(400, "All fields are required");
+    if (!req.file) {
+        throw new ApiError(400, "Profile image is required");
     }
 
     const profileImagePath = req.file.path;
-    // console.log(profileImagePath);
-
-    if(!profileImagePath){
-        throw new ApiError(400, "Profile image Path is required");
-    }
 
     const profileImage = await uploadToCloudinary(profileImagePath);
 
-    // console.log(profileImage);
-
-    const user = await User.findOne({email});
-
-    if(!user){
-        throw new ApiError(400, "User not found");
+    if (LoggedUser.profilePicId) {
+        await deleteToCloudinary(LoggedUser.profilePicId);
     }
 
-    if(user.profilePic){
-       await deleteToCloudinary(user.profilePicId);
-    }
+    LoggedUser.profilePic = profileImage.secure_url;
+    LoggedUser.profilePicId = profileImage.public_id;
 
-    // console.log("profileimagedeleted")
+    await LoggedUser.save();
 
-    
-    user.profilePic = profileImage.secure_url;
-    user.profilePicId = profileImage.public_id;
-    await user.save();
+    const safeUser = await User.findById(LoggedUser._id).select("-password");
 
-    return res
-    .status(200)
-    .json(new ApiResponse(200, user, "Profile updated succesfully" ))
 
-    
-})
+    return res.status(200).json(
+        new ApiResponse(200, safeUser, "Profile updated successfully")
+    );
+});
