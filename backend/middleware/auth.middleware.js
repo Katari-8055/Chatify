@@ -1,9 +1,10 @@
 import User from "../models/user.model.js";
+import jwt from "jsonwebtoken";
 
 
 export const protectedRoute = async (req, res, next) => {
     try {
-        const token = req.cookies.accessToken;
+        const token = req.cookies.accessToken.accessToken;
         if (!token) {
             return res.status(401).json({ message: "Token not found" });
         }
@@ -18,7 +19,7 @@ export const protectedRoute = async (req, res, next) => {
         req.user = user;
         next();
     } catch (error) {
-        console.error("Auth middleware error:", error);
+        console.error("Auth middleware error:", error.message);
         return res.status(401).json({ message: "Unauthorized" });
     }
 };

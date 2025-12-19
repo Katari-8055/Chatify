@@ -103,7 +103,8 @@ export const logout = asynHandler(async (req, res)=>{
         throw new ApiError(400, "Unable to logout");
     }
 })
-export const profileUpdate = asyncHandler(async (req, res) => {
+
+export const profileUpdate = asynHandler(async (req, res) => {
     const LoggedUser = req.user;
 
     if (!req.file) {
@@ -130,3 +131,12 @@ export const profileUpdate = asyncHandler(async (req, res) => {
         new ApiResponse(200, safeUser, "Profile updated successfully")
     );
 });
+
+export const checkAuth = asynHandler(async (req, res, next)=>{
+    try {
+        res.status(200).json(req.user);
+    } catch (error) {
+        console.log("Error in check Auth Controller", error.message);
+        res.status(500).json({message: "Internal Server Error"});
+    }
+})
