@@ -8,7 +8,7 @@ const router = express.Router();
 router.post("/signup",signUp);
 router.post("/login",login);
 router.post("/logout",logout);
-router.patch("/profileUpdate", protectedRoute ,upload.single("profileImage") ,profileUpdate)
+router.put("/profileUpdate", protectedRoute ,upload.single("profileImage") ,profileUpdate)
 router.get("/checkAuth", protectedRoute,checkAuth)
 
 export default router;
