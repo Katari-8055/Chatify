@@ -5,6 +5,7 @@ import cors from "cors"
 import router from "../routes/auth.route.js"
 import errorHandler from "../middleware/error.middleware.js"
 import messageRoute from "../routes/message.route.js"
+import morgan from "morgan"
 
 
 dotenv.config()
@@ -26,6 +27,7 @@ app.use(cors({
     credentials: true,
 }))
 
+app.use(morgan("dev"));
 
 app.use("/api/v1/user", router);
 app.use("/api/v1/message", messageRoute);
